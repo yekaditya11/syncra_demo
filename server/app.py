@@ -305,9 +305,6 @@ def get_all_insights():
 def get_status():
     """Get processing status and available files"""
     return {
-        "insights_available": INSIGHTS_FILE.exists(),
-        "general_insights_available": GENERAL_INSIGHTS_FILE.exists(),
-        "additional_insights_available": ADDITIONAL_INSIGHTS_FILE.exists(),
         "markdown_files": len(list(MARKDOWN_DIR.glob("*.md"))) if MARKDOWN_DIR.exists() else 0,
         "performance_optimizations": {
             "llamaparse_workers": 4,
