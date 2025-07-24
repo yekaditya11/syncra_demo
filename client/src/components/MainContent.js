@@ -130,7 +130,7 @@ const MainContent = () => {
     }
   }, [pointFeedback, hiddenPoints, summary]);
 
-  // File upload handling
+  // File upload handling with optimized progress tracking
   const onDrop = async (acceptedFiles) => {
     const selectedFile = acceptedFiles[0];
     if (!selectedFile) return;
@@ -147,10 +147,20 @@ const MainContent = () => {
       setUploadError(null);
       setProcessingError(null);
 
-      // Upload and process file in one step
-      const response = await api.uploadAndProcessFile(selectedFile);
+      // Show immediate feedback
+      console.log("🚀 Starting optimized processing...");
 
-      console.log("Upload and process response:", response);
+      // Upload and process file with timeout for better UX
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+
+      const response = await api.uploadAndProcessFile(selectedFile, {
+        signal: controller.signal,
+        timeout: 120000
+      });
+
+      clearTimeout(timeoutId);
+      console.log("✅ Upload and process response:", response);
 
       // Set a dummy file ID for compatibility
       setFileId("processed");
@@ -175,13 +185,34 @@ const MainContent = () => {
         // Store the raw insights for potential future use
         setTables(response.insights || {});
 
-        console.log("Processed summary:", summaryText);
+        console.log("✅ Processed summary with", pointCounter - 1, "insights");
+
+        // Show success message
+        setSnackbarMessage(`Successfully processed ${Object.keys(response.insights || {}).length} sheets with ${pointCounter - 1} insights!`);
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
       }
 
     } catch (error) {
-      console.error("Error uploading and processing file:", error);
-      setUploadError(error.response?.data?.detail || error.message || "Failed to upload and process file");
-      setProcessingError(error.response?.data?.detail || error.message || "Failed to process file");
+      console.error("❌ Error uploading and processing file:", error);
+
+      // Better error handling
+      let errorMessage = "Failed to upload and process file";
+      if (error.name === 'AbortError') {
+        errorMessage = "Processing timed out. Please try with a smaller file.";
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setUploadError(errorMessage);
+      setProcessingError(errorMessage);
+
+      // Show error message
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     } finally {
       setIsUploading(false);
       setIsProcessing(false);

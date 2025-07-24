@@ -16,21 +16,33 @@ const api = {
     }
   },
 
-  // Upload and process Excel file directly
-  uploadAndProcessFile: async (file) => {
+  // Upload and process Excel file directly with optimizations
+  uploadAndProcessFile: async (file, options = {}) => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+
+      console.log("🚀 Starting optimized file upload...");
+      const startTime = Date.now();
 
       const response = await axios.post(`${API_URL}/upload_excel/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: options.timeout || 120000, // 2 minute default timeout
+        signal: options.signal, // Support for AbortController
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`📤 Upload progress: ${percentCompleted}%`);
+        },
       });
+
+      const processingTime = (Date.now() - startTime) / 1000;
+      console.log(`⚡ Processing completed in ${processingTime.toFixed(2)}s`);
 
       return response.data;
     } catch (error) {
-      console.error("File upload and processing failed:", error);
+      console.error("❌ File upload and processing failed:", error);
       throw error;
     }
   },

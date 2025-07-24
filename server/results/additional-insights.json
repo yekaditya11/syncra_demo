@@ -1,0 +1,7 @@
+[
+  "A strong negative correlation (-0.78) exists between vehicle turnaround time and OK delivery cycles across suppliers; Victor Engineers' 2.95 hrs turnaround coincides with delivery dips.",
+  "Seasonal shipment peaks in month 4 for Kamal (74,989 units) and Daxter (30,342 units) align with trip peaks, suggesting synchronized demand surges requiring capacity scaling.",
+  "CAM's machine breakdown hours (3.5 hrs in month 4) coincide with lowest delivery rates (54%), indicating a critical performance gap needing preventive maintenance focus.",
+  "Unique Systems' rising machine breakdown hours (0 to 6 hrs) despite steady trips (22 to 54) signal emerging operational risks that may degrade future delivery reliability.",
+  "Makarjyothi's consistently high shipment volume (avg 285,709 units) with zero accidents and perfect delivery sets a benchmark for balancing scale and operational safety."
+]
